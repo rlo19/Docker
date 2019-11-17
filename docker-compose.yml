@@ -1,71 +1,62 @@
 version: '2'
 
 services:
-    redis:
-        container_name: container_redis
-        image: redis:alpine
+    dbl:
+        user: "1000:50"
+        image: mariadb
+        volumes:
+            - "./.data/db:/var/lib/mysql"
+            - ./mysql:/etc/mysql/conf.d
         ports:
-            - "6379:6379"
-    php:
-        container_name: container_php
+            - 8084:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    memcache:
+        image: memcached:alpine
+        ports:
+            - 11211:11211
+    php56:
+        build:
+            context: php56-fpm
+            args:
+                TIMEZONE: ${TIMEZONE}
+        volumes:
+            - ../symfony:/var/www/symfony:cached
+            - ../AGSLMS:/var/www/AGSLMS
+            - ../PBOLMS:/var/www/PBOLMS
+            - ../RCTLMS:/var/www/RCTLMS
+            - ../uploads/gsdev/:/usr/local/gsdev
+            - ../uploads/jobclass:/usr/local/jobclass:cached
+            - ../uploads/pbodev:/usr/local/pbodev
+            - ../uploads/rctdev:/usr/local/rctdev
+    php7:
         build:
             context: php7-fpm
             args:
                 TIMEZONE: ${TIMEZONE}
         volumes:
-            - ${SYMFONY_APP_PATH}:/var/www/symfony
-            - ./logs/symfony:/var/www/symfony/var/log
-        links:
-            - redis
+            - ../ehs-admin:/var/www/ehs-admin
+            - ../EHS4:/var/www/EHS4
+            - ../EHS4/vendor:/var/www/EHS4/vendor:cached
+            - ../EHS4/var:/var/www/EHS4/var:cached
+            - ../uploads/ehs_stage:/usr/local/ehs
+            - ../uploads/jobclass:/usr/local/jobclass
+            - ../symfony:/var/www/symfony:cached
+            - ../EHS:/var/www/EHS
     nginx:
-        container_name: container_nginx
-        build:
-            context: nginx
-            args:
-                MAX_EXECUTION_TIME: ${MAX_EXECUTION_TIME}
-                SERVER_NAME: ${SERVER_NAME}
+        build: nginx
         ports:
-            - "8085:80"
+            - 80:80
         volumes_from:
-            - php
+            - php56
+            - php7
         volumes:
-            - ./logs/nginx/:/var/log/nginx
-    mysql:
-        container_name: container_mysql
-        image: mysql
-        volumes:
-            - "./.data/mysql:/var/lib/mysql"
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            - ./logs/:/var/log
+            - ./nginx/conf/sites-enabled:/etc/nginx/sites-enabled
+    redis:
+        image: redis:alpine
         ports:
-            - "8084:3306"
-    rabbit:
-        container_name: container_rabbit
-        hostname: rabbit
-        image: rabbitmq:3-management
-        environment:
-            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-        volumes:
-            - ./.data/rabbitmq/:/var/lib/rabbitmq
-        ports:
-            - "5672:5672"
-            - "15672:15672"
-    elk:
-      container_name: container_elk
-      image: sebp/elk
-      volumes:
-          - ./elk/logstash:/etc/logstash
-          - ./elk/logstash/patterns:/opt/logstash/patterns
-          - ./.data/elasticsearch:/var/lib/elasticsearch
-#          - ./elk/elasticsearch:/etc/elasticsearch # to place elastisearch.yml configuration
-      volumes_from:
-          - php
-          - nginx
-      ports:
-        - "5601:5601"
-        - "9200:9200"
-        - "5044:5044"
+            - 6379:6379
