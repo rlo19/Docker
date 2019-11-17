@@ -13,7 +13,7 @@ libicu-dev \
 libsqlite3-dev \
 libcurl4-gnutls-dev \
 && apt-get install git -y \
-&& apt-get install -y libmcrypt-dev mysql-client \
+&& apt-get install -y libmcrypt-dev  default-mysql-client \
 && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
 && docker-php-ext-install -j$(nproc) iconv pdo_mysql gd zip curl bcmath intl opcache mbstring gd \
 && pecl install mcrypt-1.0.1 \
