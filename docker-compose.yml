@@ -25,7 +25,7 @@ services:
                 MAX_EXECUTION_TIME: ${MAX_EXECUTION_TIME}
                 SERVER_NAME: ${SERVER_NAME}
         ports:
-            - "80:80"
+            - "8085:80"
         volumes_from:
             - php
         volumes:
@@ -41,7 +41,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         ports:
-            - "3306:3306"
+            - "8084:3306"
     rabbit:
         container_name: container_rabbit
         hostname: rabbit
