@@ -18,40 +18,20 @@ services:
         image: memcached:alpine
         ports:
             - 11211:11211
-    php56:
-        build:
-            context: php56-fpm
-            args:
-                TIMEZONE: ${TIMEZONE}
-        volumes:
-            - ../symfony:/var/www/symfony:cached
-            - ../AGSLMS:/var/www/AGSLMS
-            - ../PBOLMS:/var/www/PBOLMS
-            - ../RCTLMS:/var/www/RCTLMS
-            - ../uploads/gsdev/:/usr/local/gsdev
-            - ../uploads/jobclass:/usr/local/jobclass:cached
-            - ../uploads/pbodev:/usr/local/pbodev
-            - ../uploads/rctdev:/usr/local/rctdev
     php7:
         build:
             context: php7-fpm
             args:
                 TIMEZONE: ${TIMEZONE}
         volumes:
-            - ../ehs-admin:/var/www/ehs-admin
-            - ../EHS4:/var/www/EHS4
-            - ../EHS4/vendor:/var/www/EHS4/vendor:cached
-            - ../EHS4/var:/var/www/EHS4/var:cached
-            - ../uploads/ehs_stage:/usr/local/ehs
-            - ../uploads/jobclass:/usr/local/jobclass
-            - ../symfony:/var/www/symfony:cached
-            - ../EHS:/var/www/EHS
+            - ../bookrental:/var/www/bookrental
+            - ../bookrental/vendor:/var/www/bookrental/vendor:cached
+            - ../bookrental/var:/var/www/bookrental/var:cached
     nginx:
         build: nginx
         ports:
-            - 80:80
+            - 8085:80
         volumes_from:
-            - php56
             - php7
         volumes:
             - ./logs/:/var/log
