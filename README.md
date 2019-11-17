@@ -21,12 +21,7 @@
 
 ```bash
     # /etc/hosts
-    127.0.0.1 ehslms4
-    127.0.0.1 ehslms
-    127.0.0.1 pbolms
-    127.0.0.1 gslms
-    127.0.0.1 ldplms
-    127.0.0.1 rctlms
+    127.0.0.1 bookrental
     127.0.0.1 dbl
     127.0.0.1 redis
 ```
